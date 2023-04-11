@@ -35,17 +35,17 @@ function main() {
 function getServer() {
   const server = new grpc.Server()
 
-  server.addService(shopPackage.AuthService.service, {
-    // 'AuthUser': (call, callback) => {
-    //   console.log(call.request)
-    // },
+  const serviceHandler: AuthServiceHandlers = {
     'AuthUser': AuthUser,
-  } as unknown as AuthServiceHandlers)
+  } as unknown as AuthServiceHandlers
+
+  server.addService(shopPackage.AuthService.service, serviceHandler)
 
   return server
 }
 
 main()
+
 
 function AuthUser(call: ServerUnaryCall<User, AuthResponse>, callback: sendUnaryData<AuthResponse>) {
   const requestData = call.request

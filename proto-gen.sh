@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npx proto-loader-gen-types --grpcLib=@grpc/grpc-js --outDir=proto/ proto/*.proto
+npx proto-loader-gen-types --enums=String --grpcLib=@grpc/grpc-js --outDir=proto/ proto/*.proto
