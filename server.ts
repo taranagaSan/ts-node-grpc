@@ -2,13 +2,15 @@
 import path from 'path'
 import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
-import {ProtoGrpcType} from './proto/shop'
+import { ProtoGrpcType } from './proto/shop'
 import { sendUnaryData, ServerUnaryCall } from '@grpc/grpc-js/src/server-call'
 import { AuthServiceHandlers } from './proto/shopPackage/AuthService'
 import { User } from './proto/shopPackage/User'
 import { AuthResponse } from './proto/shopPackage/AuthResponse'
+import { Status } from '@grpc/grpc-js/src/constants'
 
 const PORT = 8082
+const HOST = '0.0.0.0'
 const PROTO_FILE = './proto/shop.proto'
 
 const packageDef = protoLoader.loadSync(path.resolve(__dirname, PROTO_FILE))
@@ -21,7 +23,7 @@ const users: User[] = []
 function main() {
   const server = getServer()
 
-  server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(),
+  server.bindAsync(`${HOST}:${PORT}`, grpc.ServerCredentials.createInsecure(),
   (err, port) => {
     if (err) {
       console.error(err)
@@ -52,7 +54,7 @@ function AuthUser(call: ServerUnaryCall<User, AuthResponse>, callback: sendUnary
   console.info(requestData)
   if (!requestData.name || !requestData.email || !requestData.password) {
     callback({
-      code: 400,
+      code: Status.INVALID_ARGUMENT,
       details: 'Не заполнены обязательные поля',
     })
     return
@@ -60,7 +62,7 @@ function AuthUser(call: ServerUnaryCall<User, AuthResponse>, callback: sendUnary
 
   if (users.find((user) => user.name === requestData.name)) {
     callback({
-      code: 400,
+      code: Status.ALREADY_EXISTS,
       details: 'Такой пользователь уже существует',
     })
     return
